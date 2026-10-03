@@ -180,7 +180,6 @@ def process_command(command, current_location, locations_dict, inventory, field,
         # Basic help
         if len(parts) == 1:
             print("\n--- Help Menu ---")
-            print("help commands           - Show all commands")
             print("help locations          - Show all locations")
             print("help items              - Show all items")
             print("help selling            - Show all sellable crops")
@@ -222,18 +221,6 @@ def process_command(command, current_location, locations_dict, inventory, field,
             print("inventory               - Show your inventory")
             print("add <item>              - Add an item (debugging)")
             print(" `                      - Return to main menu")
-            return current_location
-
-        # help commands
-        if parts[1] == "commands":
-            print("\n--- Commands ---")
-            print("go <location>   - Move to a location")
-            print("inventory       - Show your inventory")
-            print("add <item>      - Add an item (testing)")
-            print("help            - Show help menu")
-            print("help locations  - Show all locations")
-            print("help items      - Show all items")
-            print("m               - Return to main menu")
             return current_location
 
         # help locations
