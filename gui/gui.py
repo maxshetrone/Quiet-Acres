@@ -1,11 +1,17 @@
 # gui.py
 
+print(">>> gui.py is being imported")
 
+from engine.game_bridge import game_callback
+from engine.game_loop import start_new_game
+from engine.game_loop import start_loaded_game
+from engine.commands import process_command
+from systems.save_load import save_game
 import customtkinter as ctk
 import tkinter as tk
 
 
-class QuietAcresGUI(ctk.CTk):
+class ToolTip:
     def __init__(self, widget, text, delay=500):
         self.widget = widget
         self.text = text
@@ -53,9 +59,9 @@ class QuietAcresGUI(ctk.CTk):
             self.tip = None
 
 
-THEME_BG = "#1a1414"
-THEME_FG = "#dbdbdb"
-THEME_ACCENT = "#0b0a0a"
+THEME_BG = "#2b2b2b"
+THEME_FG = "#e8e8e8"
+THEME_ACCENT = "#2b2b2b"
 THEME_ACCENT_FG = "#ffffff"
 THEME_FIELD_BG = "#3c3c3c"
 THEME_FONT_FAMILY = "Consolas"
@@ -66,40 +72,93 @@ def apply_theme(root):
     root.configure(fg_color=THEME_BG)
 
 
-class Application:
+class QuietAcresGUI:
     def __init__(self, root):
+        self.root = root
+        root.title("Quiet Acres")
+        root.geometry("900x600")
+        apply_theme(root)
+
+        self.game_name = ctk.CTkLabel(root, text="Quiet Acres", font=ctk.CTkFont(family="Helvetica", size=42), text_color=THEME_FG, width=377, height=65)
+        self.game_name.place(x=262, y=91)
+
+        self.start_new_game_btn = ctk.CTkButton(root, text="Start New Game", command=self.on_start_new_game_button_1, fg_color="#171717", font=ctk.CTkFont(family="Helvetica", size=12), text_color=THEME_ACCENT_FG, width=195, height=52)
+        self.start_new_game_btn.place(x=353, y=195)
+        #self.start_new_game_btn.bind("<Button-1>", self.on_start_new_game_button_1)
+        ToolTip(self.start_new_game_btn, "Start a new game.")
+
+        self.start_loaded_game = ctk.CTkButton(root, text="Start Loaded Game", command=self.on_start_loaded_game_button_1, fg_color="#171717", font=ctk.CTkFont(family="Helvetica", size=12), text_color=THEME_ACCENT_FG, width=195, height=52)
+        self.start_loaded_game.place(x=353, y=260)
+        #self.start_loaded_game.bind("<Button-1>", self.on_start_loaded_game_button_1)
+        ToolTip(self.start_loaded_game, "Start a loaded game.")
+
+        self.quit_btn = ctk.CTkButton(root, text="Quit", command=self.root.destroy, fg_color="#171717", font=ctk.CTkFont(family="Helvetica", size=13), text_color=THEME_ACCENT_FG, width=195, height=52)
+        self.quit_btn.place(x=353, y=325)
+        ToolTip(self.quit_btn, "Quit")
+
+        self.output_box = ctk.CTkTextbox(root, fg_color="#292929", text_color=THEME_FG, font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), width=765, height=480)
+
+    def open_quiet_acres(self):
+        return QuietAcresGUI2(self.root)
+
+    def on_start_new_game_button_1(self):
+        self.root.withdraw()
+        game_callback("start")
+        QuietAcresGUI2(self.root)
+
+    def on_start_loaded_game_button_1(self):
+        game_callback("load")
+        QuietAcresGUI2(self.root)
+
+
+class QuietAcresGUI2:
+    def __init__(self, master):
+        root = ctk.CTkToplevel(master)
         self.root = root
         root.title("Quiet Acres")
         root.geometry("800x600")
         apply_theme(root)
 
-        self.return_to_menu = ctk.CTkButton(root, text="Click to return to Menu", command=self.on_return_to_menu, text_color="#f2f2f2", font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), fg_color=THEME_ACCENT, corner_radius=0, width=172, height=32)
-        self.return_to_menu.place(x=5, y=5)
-        ToolTip(self.return_to_menu, "Click to return to menu. Or type ` to return to menu.")
+        self.main_menu_btn = ctk.CTkButton(root, text="Return to main menu", command=self.on_main_menu_btn, fg_color="#171717", font=ctk.CTkFont(family="Helvetica", size=12), text_color=THEME_ACCENT_FG, width=171, height=40)
+        self.main_menu_btn.place(x=13, y=13)
+        ToolTip(self.main_menu_btn, "Return to main menu.")
+        self.main_menu_btn.bind("<Button-1>", self.on_main_menu_btn_button_1)
 
-        self.text_box = ctk.CTkEntry(root, font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), fg_color=THEME_FIELD_BG, text_color=THEME_FG, corner_radius=0, width=765, height=26)
-        self.text_box.place(x=13, y=559)
-        ToolTip(self.text_box, "Type command.")
+        self.help_label = ctk.CTkLabel(root, text="Type 'help' for a list of commands", text_color="#ffffff", fg_color="#171717", font=ctk.CTkFont(family="Helvetica", size=11), width=247, height=39)
+        self.help_label.place(x=208, y=14)
 
-        self.help_text = ctk.CTkLabel(root, text="Type 'help' to show all commands.", text_color="#f2f2f2", fg_color="#0b0a0a", font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), corner_radius=0, width=273, height=32)
-        self.help_text.place(x=195, y=5)
+        self.text_box = ctk.CTkEntry(root, font=ctk.CTkFont(family="Helvetica", size=13), fg_color=THEME_FIELD_BG, text_color=THEME_FG, width=765, height=30)
+        self.text_box.place(x=18, y=560)
+        self.text_box.bind("<Return>", self.on_enter)
 
-        self.version_number = ctk.CTkButton(root, text="Version: ", command=self.on_version_number, text_color="#f2f2f2", font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), fg_color=THEME_ACCENT, corner_radius=0, width=140, height=32)
-        self.version_number.place(x=650, y=5)
-        ToolTip(self.version_number, "Click to open Github.")
+        self.output_box = ctk.CTkTextbox(root, fg_color="#292929", text_color=THEME_FG, font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), width=765, height=480)
+        self.output_box.place(x=18, y=70)
 
-        self.output_box = ctk.CTkTextbox(root, fg_color="#000000", text_color=THEME_FG, font=ctk.CTkFont(family=THEME_FONT_FAMILY, size=THEME_FONT_SIZE), width=765, height=494)
-        self.output_box.place(x=13, y=53)
+        self.scroll_bar = ctk.CTkScrollbar(root, orientation="vertical", width=20, height=470)
+        self.scroll_bar.place(x=760, y=80)
 
-    def on_return_to_menu(self):
-        pass
+        self.scroll_bar.configure(command=self.output_box.yview)
+        self.output_box.configure(yscrollcommand=self.scroll_bar.set)
 
-    def on_version_number(self):
-        pass
+    def on_enter(self, event):
+        cmd = self.text_box.get()
+        self.text_box.delete(0, tk.END)
 
+        response = game_callback(cmd)
 
-if __name__ == "__main__":
+        self.output_box.insert("end", f"> {cmd}\n{response}\n")
+        self.output_box.see("end")
+
+    def on_main_menu_btn(self):
+        self.root.withdraw()
+        QuietAcresGUI(self.root)
+
+    def on_main_menu_btn_button_1(self, event):
+        self.root.withdraw()
+        QuietAcresGUI(self.root)
+
+def gui():
     ctk.set_appearance_mode("dark")
     root = ctk.CTk()
-    app = Application(root)
+    app = QuietAcresGUI(root)
     root.mainloop()

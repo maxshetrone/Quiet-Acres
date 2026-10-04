@@ -1,8 +1,8 @@
 # game_loop.py
 
-import sys
+#import sys
 import time
-from systems.save_load import load_game, save_game
+from systems.save_load import save_game
 from utils.helpers import clear
 from systems.farming import grow_crops
 from data.locations import locations
@@ -10,37 +10,37 @@ from engine.commands import process_command
 from engine.inventory import Inventory
 
 # main loop
-def start_game():
-    clear()
-    print("--- Welcome to Quiet Acres! ---")
-    print("Pick a option:")
-    print("1. Start a new game.")
-    print("2. Load a saved game.")
-    print("3. Quit the game.")
+#def start_game():
+    #clear()
+    #print("--- Welcome to Quiet Acres! ---")
+    #print("Pick a option:")
+    #print("1. Start a new game.")
+    #print("2. Load a saved game.")
+    #print("3. Quit the game.")
 
-    choice = input("Enter your choice (1, 2, or 3): ")
+    #choice = input("Enter your choice (1, 2, or 3): ")
 
-    if choice == "1":
-        start_new_game()
-    elif choice == "2":
-        data = load_game()
-        if data is None:
-            time.sleep(1)
-            start_game()
-            return
-        start_loaded_game(data)
-    elif choice == "3":
-        print("Thanks for playing!")
-        time.sleep(1)
-        sys.exit()
-    else:
-        print("Invalid choice.")
-        time.sleep(1)
-        start_game()
+    #if choice == "1":
+    #    start_new_game()
+    #elif choice == "2":
+    #    data = load_game()
+    #    if data is None:
+    #        time.sleep(1)
+    #        start_game()
+    #        return
+    #    start_loaded_game(data)
+    #elif choice == "3":
+    #    print("Thanks for playing!")
+    #   time.sleep(1)
+    #   sys.exit()
+    #else:
+    #    print("Invalid choice.")
+    #    time.sleep(1)
+    #    start_game()
 
 def start_new_game():
     clear()
-    print("[Press ` to return to main menu] [Type 'help' for a list of commands].\n")
+    #print("[Press ` to return to main menu] [Type 'help' for a list of commands].\n")
     last_autosave = time.time()
 
     # variables needed
@@ -74,10 +74,6 @@ def start_new_game():
 
         # grow crops every turn
         grow_crops(field)
-
-        if command == "`":
-            start_game()
-            return
         
          # autosave check
         current_time = time.time()
@@ -118,10 +114,6 @@ def start_loaded_game(data):
 
     while True:
         command = input("\nWhat do you want to do? ")
-
-        if command == "`":
-            start_game()
-            return
 
         grow_crops(field)
 
