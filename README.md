@@ -9,7 +9,7 @@ Thanks for playing!
 You can download and change this code as much as you want. But if you post it to anyone please give me credit.
 
 To build the `.exe`:
-python -m PyInstaller script.py
+python -m PyInstaller main.py
 
 # TODO:
 - Fix clicking "Start Loaded Game" still loading a game even if there is no save file.
